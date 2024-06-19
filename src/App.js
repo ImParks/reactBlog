@@ -69,11 +69,11 @@ function App() {
 
     const deletePost = (index) => {
       let copy = [...posts]
-      let newPost = copy.filter((_, i)=> i !== index);
+      copy.splice(index,1);
       setModel(false);
       setPostIndex(null);
       setPostFixIndex(null);
-     setPosts(newPost);
+     setPosts(copy);
     }
 
     //게시글 작성할때 사용. 글의 길이비교 이후 글작성 및 창 축소, 버튼값 변경
