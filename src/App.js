@@ -10,25 +10,29 @@ function App() {
 	let blog = '내 블로그';
 	
   	let [posts,setPosts] =  useState([
-		['강남 우동맛집',0],
-		['홍대 라멘맛집',0],
-		['동대문 닭칼국수 맛집',0]
+		['강남 우동맛집',0,'2024년 2월 11일','강남엔 이러한 우동맛집이 있다.'],
+		['홍대 라멘맛집',0,'2024년 2월 11일','홍대엔 이러한 라멘 맛집이 있다.'],
+		['동대문 닭칼국수 맛집',0,'2024년 2월 11일','동대문엔 이러한 닭칼국수 맛집이 있다.']
 	]); 
   	const [postFixText,setPostFixText] = useState('');
+    const [postFixTitle,setPostFixTitle] = useState('');
     const [postFixIndex,setPostFixIndex] = useState(null);
+    
     const [postAdd,setPostAdd] = useState(false);
     const [sortMethod,setSortMethod] = useState('lick');
     const [buttonText,setButtonText] = useState('글쓰기');
     const [modal, setModel] = useState(false);
+    const [postIndex,setPostIndex] = useState(null);
 
     // 2차원 배열을 사용하기 때문에 좋아요 를 누를때 배열의 두번째에 값을 +1해줘야함.
     const likeUp = (index) =>{
 	
       let newPost = [...posts];
-      newPost[index] = [newPost[index][0], newPost[index][1]+1];
-      if(sortMethod === 'lick'){
+      newPost[index] = [newPost[index][0], newPost[index][1]+1,newPost[index][2],newPost[index][3]];
+      if(!modal && sortMethod === 'lick'){
       newPost = newPost.sort((a,b)=>b[1]-a[1]);
     }
+    
       setPosts(newPost);
     
     }
@@ -37,6 +41,10 @@ function App() {
       setPostFixText(e.target.value);
     }
     
+    const onChangeTitle = (e) => {
+      setPostFixTitle(e.target.value);
+    }
+
     // 글수정 탭을 여는 함수, 몇번째에 있는 글수정 탭을 열어야하는지 알아야되기 때문에 몇번째에 있는 글인지 확인해줌
     const editText = (index) =>{
       setPostFixIndex(index);
@@ -44,13 +52,13 @@ function App() {
     
     // 글 수정
     const fixPost = (index) => {
-    if(postFixText.length<3){
+    if(postFixTitle.length<3 && postFixText.length<3){
       alert("너무 짧게 썻어요");
     return;
     }
 
       let newPost = [...posts];
-      newPost[index] = [postFixText, newPost[index][1]];
+      newPost[index] = [postFixTitle, newPost[index][1],newPost[index][2],postFixText];
       
       setPosts(newPost);
     
@@ -62,18 +70,22 @@ function App() {
     const deletePost = (index) => {
       let copy = [...posts]
       let newPost = copy.filter((_, i)=> i !== index);
-    
+      setModel(false);
+      setPostIndex(null);
+      setPostFixIndex(null);
      setPosts(newPost);
     }
 
     //게시글 작성할때 사용. 글의 길이비교 이후 글작성 및 창 축소, 버튼값 변경
     const addPost = () =>{
-      if(postFixText.length < 3){
+      if(postFixTitle.length<3 && postFixText.length<3){
         alert("너무 짧게 썻어요");
         return;
       }
       let newPost = [...posts]
-      newPost.push([postFixText, 0]);
+      let date = new Date();
+      const formattedDate = `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일`;
+      newPost.push([postFixTitle, 0,formattedDate,postFixText]);
       setPosts(newPost)
       setPostAdd(false);
       setButtonText('글쓰기');
@@ -103,6 +115,7 @@ function App() {
         newPost = newPost.sort((a,b)=>(a[0]<b[0])?-1:(b[0]===a[0])?0:1);
       }
       setPosts(newPost);
+      setModel(false);
 
     }
     
@@ -141,7 +154,9 @@ function App() {
 
     {postAdd && (
       <div>
-      <input type="text" placeholder="새로운 글 작성중" onChange={onChangeText} />
+      <input type="text" placeholder="제목" onChange={onChangeTitle} />
+      <br/>
+      <input type="text" placeholder="내용" onChange={onChangeText} />
       <br/>
       <button onClick={()=>addPost()}>저장</button>
       </div>
@@ -149,6 +164,21 @@ function App() {
     )}
     </div>
   )
+    const modalChange = (index) => {
+      let mod = modal&&index===postIndex?false:true;
+ 
+      setModel(mod);
+      setPostIndex(mod?index:null);
+      if(!mod && sortMethod === 'lick'){
+        let copy = [...posts];
+        copy = copy.sort((a,b)=>b[1]-a[1]);
+        setPosts(copy)
+      }
+
+
+    }
+
+
 
 
 
@@ -161,18 +191,13 @@ function App() {
     {
       posts.map(function(postInfo, index){
         return (
-          <h4 key={index}><div onClick={()=> setModel((modal?false:true))}>{postInfo[0]}</div> <span onClick={()=> likeUp(index)}>[좋아요]</span> {postInfo[1]}
+          <h4 key={index}><div onClick={() => modalChange(index)}>{postInfo[0]}</div> <span onClick={()=> likeUp(index)}>[좋아요]</span> {postInfo[1]}
           <br />
-          <button onClick={()=>editText(index)}>글수정</button><button onClick={()=>deletePost(index)}>글삭제</button>
-            {postFixIndex === index ?(
-    
-              <div>
-                <input type="text" placeholder={postInfo[0]} onChange={onChangeText} />
-    
-                <button onClick={()=>fixPost(index)}>저장</button>
-              </div>
-            ):null
-          }                
+          {modal&&postIndex!==null && index === postIndex ?(
+    <PostRead post={posts[postIndex]} postIndex = {postIndex} color={'skyblue'} editText = {editText} deletePost={deletePost} onChangeText = {onChangeText} postFixIndex = {postFixIndex} fixPost = {fixPost} onChangeTitle = {onChangeTitle} likeUp = {likeUp}/>
+    ):null
+}
+           
           <hr />
           </h4>
 
@@ -182,20 +207,32 @@ function App() {
     }
 
     <h4>{ insertText }</h4>
-    {modal ?(
-    <PostRead/>
-    ):null
-}
+
 	</div>
   );
 };
 
-function PostRead(){
+
+
+
+function PostRead(props){
   return (
-		<div className="modal">
-      <h4>제목</h4>
-      <p>날짜</p>
-      <p>상세내용</p>
+		<div className="modal" style={{background : props.color}}>
+      <h4>{props.post[0]}</h4>
+      <p>{props.post[2]}</p>
+      <p>{props.post[3]}</p>
+      <br/>
+      <span onClick={()=> props.likeUp(props.postIndex)}>[좋아요] {props.post[1]}</span>
+                <button onClick={()=>props.editText(props.postIndex)}>글수정</button><button onClick={()=>props.deletePost(props.postIndex)}>글삭제</button>
+            {props.postFixIndex === props.postIndex ?(
+              
+              <div>
+                <input type="text" placeholder={props.post[0]} onChange={props.onChangeTitle} />
+                <input type="text" placeholder={props.post[3]} onChange={props.onChangeText} />
+                <button onClick={()=>props.fixPost(props.postIndex)}>저장</button>
+              </div>
+            ):null
+          }     
     </div>
   )
 }
