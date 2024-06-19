@@ -21,7 +21,7 @@ function App() {
     const [postAdd,setPostAdd] = useState(false);
     const [sortMethod,setSortMethod] = useState('lick');
     const [buttonText,setButtonText] = useState('글쓰기');
-    const [modal, setModel] = useState(false);
+    const [model, setModel] = useState(false);
     const [postIndex,setPostIndex] = useState(null);
 
     // 2차원 배열을 사용하기 때문에 좋아요 를 누를때 배열의 두번째에 값을 +1해줘야함.
@@ -29,7 +29,7 @@ function App() {
 	
       let newPost = [...posts];
       newPost[index] = [newPost[index][0], newPost[index][1]+1,newPost[index][2],newPost[index][3]];
-      if(!modal && sortMethod === 'lick'){
+      if(!model && sortMethod === 'lick'){
       newPost = newPost.sort((a,b)=>b[1]-a[1]);
     }
     
@@ -130,21 +130,6 @@ function App() {
 
     );
 
-  //   글 리스트 출력
-  // 	let post = _.map(posts, (postInfo, index) => (
-  //   	<h4 key={index}><div onClick={()=> setModel((modal?false:true))}>{postInfo[0]}</div> <span onClick={()=> likeUp(index)}>[좋아요]</span> {postInfo[1]}
-  //     <br />
-  //     <button onClick={()=>editText(index)}>글수정</button><button onClick={()=>deletePost(index)}>글삭제</button>
-  //       {postFixIndex === index ?(
-  //         <div>
-  //           <input type="text" placeholder={postInfo[0]} onChange={onChangeText} />
-  //           <button onClick={()=>fixPost(index)}>저장</button>
-  //         </div>
-  //       ):null
-  //     }                
-  //     <hr />
-  //     </h4>
-  // ));
 
 // 새로운 글 작성
   let insertText = (
@@ -164,8 +149,8 @@ function App() {
     )}
     </div>
   )
-    const modalChange = (index) => {
-      let mod = modal&&index===postIndex?false:true;
+    const modelChange = (index) => {
+      let mod = model&&index===postIndex?false:true;
  
       setModel(mod);
       setPostIndex(mod?index:null);
@@ -178,10 +163,6 @@ function App() {
 
     }
 
-
-
-
-
   return (
     <div className="App">
 		<div className="black-nav">    
@@ -191,13 +172,12 @@ function App() {
     {
       posts.map(function(postInfo, index){
         return (
-          <h4 key={index}><div onClick={() => modalChange(index)}>{postInfo[0]}</div> <span onClick={()=> likeUp(index)}>[좋아요]</span> {postInfo[1]}
+          <h4 key={index}><div onClick={() => modelChange(index)}>{postInfo[0]}</div> <span onClick={()=> likeUp(index)}>[좋아요]</span> {postInfo[1]}
           <br />
-          {modal&&postIndex!==null && index === postIndex ?(
-    <PostRead post={posts[postIndex]} postIndex = {postIndex} color={'skyblue'} editText = {editText} deletePost={deletePost} onChangeText = {onChangeText} postFixIndex = {postFixIndex} fixPost = {fixPost} onChangeTitle = {onChangeTitle} likeUp = {likeUp}/>
-    ):null
-}
-           
+          {model&&postIndex!==null && index === postIndex ?(
+           <PostRead post={posts[postIndex]} postIndex = {postIndex} color={'skyblue'} editText = {editText} deletePost={deletePost} onChangeText = {onChangeText} postFixIndex = {postFixIndex} fixPost = {fixPost} onChangeTitle = {onChangeTitle} likeUp = {likeUp}/>
+           ):null
+          }
           <hr />
           </h4>
 
@@ -212,16 +192,13 @@ function App() {
   );
 };
 
-
-
-
 function PostRead(props){
   return (
-		<div className="modal" style={{background : props.color}}>
+		<div className="model" style={{background : props.color}}>
       <h4>{props.post[0]}</h4>
-      <p>{props.post[2]}</p>
       <p>{props.post[3]}</p>
       <br/>
+      <p>{props.post[2]}</p>
       <span onClick={()=> props.likeUp(props.postIndex)}>[좋아요] {props.post[1]}</span>
                 <button onClick={()=>props.editText(props.postIndex)}>글수정</button><button onClick={()=>props.deletePost(props.postIndex)}>글삭제</button>
             {props.postFixIndex === props.postIndex ?(
