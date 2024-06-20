@@ -8,11 +8,15 @@ function App() {
 	
 	
 	let blog = '내 블로그';
+
+  let postDate = new Date();
+  const postsDate = ;
+  newPost.push([postFixTitle, 0,formattedDate,postFixText]);
 	
   	let [posts,setPosts] =  useState([
-		['강남 우동맛집',0,'2024년 2월 11일','강남엔 이러한 우동맛집이 있다.'],
-		['홍대 라멘맛집',0,'2024년 2월 11일','홍대엔 이러한 라멘 맛집이 있다.'],
-		['동대문 닭칼국수 맛집',0,'2024년 2월 11일','동대문엔 이러한 닭칼국수 맛집이 있다.']
+		['강남 우동맛집',0,`${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()-3}일`,'강남엔 이러한 우동맛집이 있다.'],
+		['홍대 라멘맛집',0,`${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()-2}일`,'홍대엔 이러한 라멘 맛집이 있다.'],
+		['동대문 닭칼국수 맛집',0,`${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()-1}일`,'동대문엔 이러한 닭칼국수 맛집이 있다.']
 	]); 
   	const [postFixText,setPostFixText] = useState('');
     const [postFixTitle,setPostFixTitle] = useState('');
